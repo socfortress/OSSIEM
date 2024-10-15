@@ -38,6 +38,21 @@ Most of these services will need some tewaking before you are able to integrate 
 After initial deployment, the Wazuh Dashboard will present an error in the health check for the wazuh-alerts index as this has not been created yet. This error will only be fully fixed after 
 successfully integarting Graylog and the Wazuh Indexer. You can go ahead and create any necessary users/roles for the upcoming integrations to work correctly.
 
+#### Wazuh Rules
+
+Exec into the Wazuh Manager Container
+```
+docker exec -it wazuh.manager /bin/bash
+```
+
+```
+dnf install git -y
+```
+
+```
+curl -so ~/wazuh_socfortress_rules.sh https://raw.githubusercontent.com/socfortress/OSSIEM/main/wazuh_socfortress_rules.sh && bash ~/wazuh_socfortress_rules.sh
+```
+
 ### Graylog
 
 While the container is running, you'll need to access it's console to perform some extra steps in order to add the Wazuh root CA into Graylog's Java Keystore. Run the following command 
