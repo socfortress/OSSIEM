@@ -48,7 +48,7 @@ cp /opt/java/openjdk/lib/security/cacerts /usr/share/graylog/data/config/
 Next you need to import the Wazuh root CA into the keystore, cd into the /usr/share/graylog/data/config/ and run the following command: (change the certificate name and keystore password as needed, 
 but note that if the certificate name doesn't match the template, you'll need to modify the docker-compose.yml file accordingly)
 ```
-keytool -importcert -keystore cacerts -storepass changeit -alias wazuh_root_ca -file root_ca.pem
+keytool -importcert -keystore cacerts -storepass changeit -alias wazuh_root_ca -file root-ca.pem
 ```
 You will be prompted to accept this certificate, type "yes" and enter. After this is done Graylog will be able to connect to the Wazuh Indexer.
 
