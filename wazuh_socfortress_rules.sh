@@ -110,7 +110,7 @@ restartService() {
 healthCheck() {
     cd /var/ossec || exit 1  # Set the current working directory to /var/ossec
     logger "Performing a health check"
-    eval "service wazuh-manager restart ${debug}"
+    eval "/var/ossec/bin/wazuh-control restart ${debug}"
     sleep 20
     if [ -n "$(/var/ossec/bin/wazuh-control status | grep 'wazuh-logcollector not running...')" ]; then
         logger -e "Wazuh-Manager Service is not healthy. Please check /var/ossec/logs/ossec.log for details."
