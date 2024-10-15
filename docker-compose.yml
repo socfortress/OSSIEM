@@ -3,7 +3,7 @@ services:
   # Wazuh #
   #########
   wazuh.manager:
-    image: dloprodz/wazuh-manager:4.9.0
+    image: socfortress/wazuh-manager:4.9.0
     container_name: wazuh.manager
     hostname: wazuh.manager
     ulimits:
