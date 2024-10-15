@@ -83,6 +83,13 @@ docker exec -it velociraptor /bin/bash
 velociraptor --config server.config.yaml config api_client --name admin --role administrator,api api.config.yaml
 ```
 
+### Copilot
+
+```
+# Once Copilot has started up you can retrieve the admin password by running the following command (Only accessible the first time Copilot is started up)
+docker logs "$(docker ps --filter ancestor=ghcr.io/socfortress/copilot-backend:latest --format "{{.ID}}")" 2>&1 | grep "Admin user password"
+```
+
 ## Post-Deployment
 
 After you've reached this point you can take a short break to pat yourself in the back, it's all downhill from here on out.
