@@ -1,4 +1,6 @@
 # Open Source SIEM Stack
+
+💗 Shoutout to <a href="https://github.com/dLoProdz/OSSIEM">dLoProdz</a> for helping put this together 🧡
 <br>
 The idea behind this project is to facilitate testing of <a href="https://github.com/socfortress">SOCFortress' Open Source SIEM Stack</a>. This is by no means production safe security-wise, 
 and only intended to get people started in a lab environment. This project is licensed under GPLv3 which means you can use and modify in it any way you like, so long as you keep it under the same 
