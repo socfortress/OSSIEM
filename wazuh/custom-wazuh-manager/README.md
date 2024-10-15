@@ -8,11 +8,11 @@ This will break your Wazuh Dashboard's ability to visualize data residing in you
 
 ## Build:
 ```
-docker build -t dloprodz/wazuh-manager:[WAZUH_VERSION] --build-arg WAZUH_VERSION=[WAZUH_VERSION] --build-arg WAZUH_TAG_REVISION=[WAZUH_TAG_REVISION] .
+docker build -t socfortress/wazuh-manager:[WAZUH_VERSION] --build-arg WAZUH_VERSION=[WAZUH_VERSION] --build-arg WAZUH_TAG_REVISION=[WAZUH_TAG_REVISION] .
 ```
 Tested Version:
 ```
-docker build -t dloprodz/wazuh-manager:4.9.0 --build-arg WAZUH_VERSION=4.9.0 --build-arg WAZUH_TAG_REVISION=1 .
+docker build -t socfortress/wazuh-manager:4.9.0 --build-arg WAZUH_VERSION=4.9.0 --build-arg WAZUH_TAG_REVISION=1 .
 ```
 
 ## Usage: 
