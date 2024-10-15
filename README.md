@@ -71,6 +71,18 @@ keytool -importcert -keystore cacerts -storepass changeit -alias wazuh_root_ca -
 ```
 You will be prompted to accept this certificate, type "yes" and enter. After this is done Graylog will be able to connect to the Wazuh Indexer.
 
+### Velociraptor
+
+We now need to generate the `api.config.yaml` file which CoPilot will use to access the Velociraptor API
+
+```
+docker exec -it velociraptor /bin/bash
+```
+
+```
+velociraptor --config server.config.yaml config api_client --name admin --role administrator,api api.config.yaml
+```
+
 ## Post-Deployment
 
 After you've reached this point you can take a short break to pat yourself in the back, it's all downhill from here on out.
