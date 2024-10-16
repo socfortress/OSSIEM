@@ -85,7 +85,7 @@ docker exec -it velociraptor /bin/bash
 ```
 
 ```
-velociraptor --config server.config.yaml config api_client --name admin --role administrator,api api.config.yaml
+./velociraptor --config server.config.yaml config api_client --name admin --role administrator,api api.config.yaml
 ```
 
 ### Copilot
