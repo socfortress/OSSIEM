@@ -128,8 +128,8 @@ services:
       - ./graylog/root-ca.pem:/usr/share/graylog/data/config/root-ca.pem
       - ./graylog/GeoLite2-City.mmdb:/usr/share/graylog/data/config//GeoLite2-City.mmdb
       - ./graylog/GeoLite2-ASN.mmdb:/usr/share/graylog/data/config/GeoLite2-ASN.mmdb
-      - ./config/network_ports.csv:/etc/graylog/network_ports.csv
-      - ./config/software_vendors.csv:/etc/graylog/software_vendors.csv
+      - ./graylog/network_ports.csv:/etc/graylog/network_ports.csv
+      - ./graylog/software_vendors.csv:/etc/graylog/software_vendors.csv
     ports:
       # Graylog web interface and REST API
       - 9000:9000
