@@ -1,0 +1,127 @@
+---
+- name: Setup OSSIEM Stack
+  hosts: all
+  become: true
+  vars:
+    repo_url: "https://github.com/socfortress/OSSIEM"
+    # Define where to clone the repo. Adjust as needed.
+    install_path: "/root"
+    repo_name: "OSSIEM"
+    # Full path to the cloned repo
+    project_root: "{{ install_path }}/{{ repo_name }}"
+
+  tasks:
+    - name: Check if project directory exists
+      ansible.builtin.stat:
+        path: "{{ project_root }}"
+      register: project_dir_stat
+
+    - name: Pre-cleanup - Stop containers to release file locks
+      ansible.builtin.command:
+        cmd: docker compose down
+        chdir: "{{ project_root }}"
+      when: project_dir_stat.stat.exists
+      ignore_errors: true
+
+    - name: Pre-cleanup - Remove directories that should be files
+      ansible.builtin.file:
+        path: "{{ project_root }}/graylog/{{ item }}"
+        state: absent
+      loop:
+        - nist_800_53_to_cui.csv
+        - network_ports.csv
+        - software_vendors.csv
+
+    - name: Step 1 - Clone the repository
+      ansible.builtin.git:
+        repo: "{{ repo_url }}"
+        dest: "{{ project_root }}"
+        version: main
+        force: yes
+
+    - name: Step 2 - Update the max memory map
+      ansible.posix.sysctl:
+        name: vm.max_map_count
+        value: '262144'
+        state: present
+        reload: yes
+
+    - name: Step 3 - Update network receive buffer
+      ansible.posix.sysctl:
+        name: net.core.rmem_max
+        value: '1048576'
+        state: present
+        reload: yes
+
+    - name: Step 4 - Run the indexer certs generator
+      ansible.builtin.command:
+        cmd: docker compose -f generate-indexer-certs.yml run --rm generator
+        chdir: "{{ project_root }}/wazuh"
+
+    - name: Step 6 - Copy root ca into graylog
+      ansible.builtin.copy:
+        src: "{{ project_root }}/wazuh/config/wazuh_indexer_ssl_certs/root-ca.pem"
+        dest: "{{ project_root }}/graylog/root-ca.pem"
+        remote_src: yes
+
+    - name: Ensure Graylog CSV files exist
+      ansible.builtin.file:
+        path: "{{ project_root }}/graylog/{{ item }}"
+        state: touch
+        mode: '0644'
+      loop:
+        - nist_800_53_to_cui.csv
+        - network_ports.csv
+        - software_vendors.csv
+
+    - name: Step 8 - Change graylog file permissions
+      ansible.builtin.file:
+        path: "{{ project_root }}/graylog"
+        owner: "1100"
+        group: "1100"
+        recurse: yes
+
+    - name: Step 9 - Run docker compose up
+      ansible.builtin.command:
+        cmd: docker compose up -d
+        chdir: "{{ project_root }}"
+
+    - name: Wait for Graylog container to be ready
+      ansible.builtin.pause:
+        seconds: 30
+
+    - name: Step 10 - Copy cacerts inside Graylog container
+      ansible.builtin.command:
+        cmd: docker exec graylog cp /opt/java/openjdk/lib/security/cacerts /usr/share/graylog/data/config/
+
+    - name: Step 11 - Import wazuh cert into keystore
+      ansible.builtin.shell:
+        cmd: >
+          docker exec graylog bash -c
+          "cd /usr/share/graylog/data/config/ &&
+           keytool -importcert -keystore cacerts -storepass changeit -alias wazuh_root_ca -file root-ca.pem -noprompt"
+
+    - name: Step 12 - Restart graylog
+      ansible.builtin.command:
+        cmd: docker restart graylog
+
+    - name: Wait for Graylog to start listening on port 5555
+      ansible.builtin.pause:
+        seconds: 10
+
+    - name: Wait for CoPilot backend to initialize
+      ansible.builtin.pause:
+        seconds: 10
+
+    - name: Step 13 - Retrieve SOCFortress CoPilot password
+      ansible.builtin.shell:
+        cmd: docker logs "$(docker ps --filter ancestor=ghcr.io/socfortress/copilot-backend:latest -q)" 2>&1 | grep "Admin user password"
+      register: copilot_password
+      retries: 5
+      delay: 5
+      until: copilot_password.rc == 0
+      ignore_errors: true
+
+    - name: Display CoPilot Password
+      ansible.builtin.debug:
+        msg: "{{ copilot_password.stdout_lines | default('Password not found yet') }}"
